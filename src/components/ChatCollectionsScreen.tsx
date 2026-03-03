@@ -1435,6 +1435,7 @@ export default function ChatCollectionsScreen({
                 disabled={page >= totalPages}
               >
                 Next
+                add new
               </button>
             </div>
           )}

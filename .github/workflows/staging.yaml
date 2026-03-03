@@ -1,0 +1,50 @@
+name: webmap-widgets pipeline to staging
+
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  buildanddeploy:
+    runs-on: ubuntu-latest
+    environment: stage
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/staging'))
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.13.1"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        
+      - name: Install dependencies
+        run: |
+          aws s3 cp s3://chaintech-env/chaintech/webmap-widget/.env .env
+          npm install --legacy-peer-deps
+          npm run build:widget && npm run build:embed
+              
+      - name: Deploy to ${{ github.ref }} environment
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          CF_ID: ${{ secrets.CF_ID }}
+        run: |
+          aws s3 cp --recursive ./dist/  s3://$BUCKET_NAME
+          aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"

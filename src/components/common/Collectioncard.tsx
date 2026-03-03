@@ -1,9 +1,10 @@
-// CollectionRecordCard.tsx
-// ✅ Common component for iframe-based collection cards
-// Used by: ChatWidget (FeaturedSlider) and ChatCollectionsScreen
-// Supports: horizontal (row) and vertical (column) layout
+// Collectioncard.tsx
+// ✅ FIXED:
+//   1. recordId hve prop tarke aave che — andar buildCollectionRecordIframeDoc FARI call nathi thati
+//   2. Map logic (recordCollectionMap, recordUrlMap) card ni andar j handle thay che
+//   3. No ID drift — actionState always matches correctly
 
-import { useRef } from "react";
+import React from "react";
 import type { CollectionTemplate } from "../../types/index";
 import { buildCollectionRecordIframeDoc } from "../../utils/collections";
 
@@ -74,8 +75,13 @@ export type CollectionRecordCardProps = {
   record: any;
   /** Collection template (html, css, js, output_ratio, etc.) */
   template: CollectionTemplate;
-  /** Index of this card in the list (used for keying iframe title) */e
+  /** Index of this card in the list (used for iframe title + iframeDoc generation) */
   recordIndex: number;
+  /**
+   * ✅ recordId parent compute kare che ane prop tarke pass kare che
+   * This avoids double-calling buildCollectionRecordIframeDoc and ID drift
+   */
+  recordId: string;
   /** Current like/view/share state for this record */
   actionState: RecordActionState;
   /**
@@ -84,19 +90,16 @@ export type CollectionRecordCardProps = {
    * - "vertical"   → full width column card (ChatCollectionsScreen grid)
    */
   layout?: "horizontal" | "vertical";
-  /**
-   * Ref map to store iframe element references by recordId.
-   * Parent uses this to postMessage like toggle requests to the iframe.
-   */
+  /** Ref map: recordId → HTMLIFrameElement — parent uses for postMessage like toggle */
   iframeRefs: React.MutableRefObject<Record<string, HTMLIFrameElement | null>>;
   /**
-   * Ref map: recordId → collectionName
-   * Parent uses this when making analytics API calls.
+   * ✅ Ref map: recordId → collectionName
+   * CollectionRecordCard populates this internally so parent does NOT need to do it separately
    */
   recordCollectionMap: React.MutableRefObject<Record<string, string>>;
   /**
-   * Ref map: recordId → record URL
-   * Parent uses this to open the record URL on share/card click.
+   * ✅ Ref map: recordId → record URL
+   * CollectionRecordCard populates this internally so parent does NOT need to do it separately
    */
   recordUrlMap: React.MutableRefObject<Record<string, string>>;
   /** Called when user clicks the like button */
@@ -124,7 +127,7 @@ const CardActionButtons = ({
     style={{
       display: "flex",
       alignItems: "center",
-      gap:"12px",
+      gap: "12px",
       width: "100%",
       boxSizing: "border-box",
       padding: "4px 1px 2px 1px",
@@ -218,6 +221,7 @@ export const CollectionRecordCard = ({
   record,
   template,
   recordIndex,
+  recordId,
   actionState,
   layout = "vertical",
   iframeRefs,
@@ -227,29 +231,32 @@ export const CollectionRecordCard = ({
   onShareClick,
   onCardClick,
 }: CollectionRecordCardProps) => {
+  // ✅ buildCollectionRecordIframeDoc sirf srcDoc/frameWidth/frameHeight mate — recordId mate nahi
+  // recordId baharathi aave che so no drift between parent's actionStates and rendered card
   const iframeDoc = buildCollectionRecordIframeDoc(
     record,
     template,
     recordIndex,
   );
-  const { srcDoc, frameWidth, frameHeight, recordId, collectionName } =
-    iframeDoc;
+  const { srcDoc, frameWidth, frameHeight, collectionName } = iframeDoc;
 
-  // Populate parent ref maps so parent can use recordId for analytics/navigation
+  // ✅ Map logic andar — parent ne manually populate karvu nathi padtu
   const resolvedCollectionName =
     record?.collection_name ?? record?.collection ?? collectionName;
   const resolvedUrl =
     record?.url ?? record?.link ?? record?.page_url ?? record?.website ?? "";
+
   recordCollectionMap.current[recordId] = resolvedCollectionName;
   recordUrlMap.current[recordId] = resolvedUrl;
 
-  // Fallback state if parent hasn't populated yet
-  const state: RecordActionState = actionState ?? {
-    likeCount: iframeDoc.initialLikeCount,
-    viewCount: iframeDoc.initialViewCount,
-    shareCount: iframeDoc.initialShareCount,
-    isLiked: false,
-  };
+  // ── For horizontal layout: scale iframe to fit exactly 2 cards per view ──
+  // Backend CSS sets fixed frameWidth inside iframe — we can't change it.
+  // So we render iframe at its natural frameWidth, then scale it down so
+  // 2 cards fit the container. Container clips overflow, scale handles resize.
+  const numericFrameWidth =
+    typeof frameWidth === "string"
+      ? parseFloat(frameWidth)
+      : (frameWidth as number);
 
   return (
     <div
@@ -258,11 +265,14 @@ export const CollectionRecordCard = ({
       style={{
         display: "flex",
         flexDirection: "column",
-        // horizontal → used inside FeaturedSlider (horizontal scroll row)
-        // vertical   → used inside ChatCollectionsScreen (grid/column layout)
         flexShrink: layout === "horizontal" ? 0 : undefined,
-        width: layout === "vertical" ? "100%" : undefined,
+        // horizontal: fixed pixel width = half container minus gap
+        // We use the iframe's own frameWidth as reference for scroll calculation
+        // but visually we contain it. Parent slider sets container width="100%"
+        width: layout === "horizontal" ? numericFrameWidth : "100%",
+        minWidth: layout === "horizontal" ? numericFrameWidth : undefined,
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <iframe
@@ -285,7 +295,7 @@ export const CollectionRecordCard = ({
       />
       <CardActionButtons
         recordId={recordId}
-        state={state}
+        state={actionState}
         onLikeToggle={onLikeToggle}
         onShareClick={onShareClick}
       />
@@ -294,4 +304,3 @@ export const CollectionRecordCard = ({
 };
 
 export default CollectionRecordCard;
-``

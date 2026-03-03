@@ -1,11 +1,12 @@
-// //chat collection file
-// // ✅ FIXED: stats.impressions → viewCount on refresh (increment-impressions-v2 updates this field)
-
 // import { useEffect, useMemo, useRef, useState } from "react";
 // import type { CollectionTemplate } from "../types/index";
 // import { fetchCollectionRecords, fetchLikesHistory } from "../services/api";
 // import { buildCollectionRecordIframeDoc } from "../utils/collections";
 // import { CONNECTOR_BASE_URL } from "../config/constants";
+// import {
+//   CollectionRecordCard,
+//   type RecordActionState,
+// } from "./common/Collectioncard";
 
 // type ChatCollectionsScreenProps = {
 //   collectionNames: string[];
@@ -19,73 +20,6 @@
 // };
 
 // const PAGE_LIMIT = 20;
-
-// const HeartIcon = ({ filled }: { filled: boolean }) => (
-//   <svg
-//     width="14"
-//     height="14"
-//     viewBox="0 0 24 24"
-//     fill={filled ? "#e53535" : "none"}
-//     stroke={filled ? "#e53535" : "#333"}
-//     strokeWidth="2.2"
-//     strokeLinecap="round"
-//     strokeLinejoin="round"
-//     style={{ pointerEvents: "none" }}
-//   >
-//     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-//   </svg>
-// );
-
-// const EyeIcon = () => (
-//   <svg
-//     width="14"
-//     height="14"
-//     viewBox="0 0 24 24"
-//     fill="none"
-//     stroke="#333"
-//     strokeWidth="2.2"
-//     strokeLinecap="round"
-//     strokeLinejoin="round"
-//     style={{ pointerEvents: "none" }}
-//   >
-//     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-//     <circle cx="12" cy="12" r="3" />
-//   </svg>
-// );
-
-// const ShareIcon = () => (
-//   <svg
-//     width="14"
-//     height="14"
-//     viewBox="0 0 24 24"
-//     fill="none"
-//     stroke="#333"
-//     strokeWidth="2.2"
-//     strokeLinecap="round"
-//     strokeLinejoin="round"
-//     style={{ pointerEvents: "none" }}
-//   >
-//     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-//     <polyline points="15 3 21 3 21 9" />
-//     <line x1="10" y1="14" x2="21" y2="3" />
-//   </svg>
-// );
-
-// type RecordActionState = {
-//   likeCount: number;
-//   viewCount: number;
-//   shareCount: number;
-//   isLiked: boolean;
-// };
-
-// const getSessionCount = (id: string): number | null => {
-//   // Not used to block impressions — every page load fires fresh impression
-//   return null;
-// };
-
-// const setSessionCount = (_id: string, _count: number): void => {
-//   // No-op — refresh = new impression, server is source of truth
-// };
 
 // const getInitialCounts = (rec: any) => {
 //   const statsAll = rec?.stats?.ALL ?? rec?.stats ?? null;
@@ -118,107 +52,6 @@
 //   return hRatio >= 0.5 && vRatio >= 0.5;
 // };
 
-// const CardActionButtons = ({
-//   recordId,
-//   state,
-//   collectionName,
-//   onLikeToggle,
-//   onShareClick,
-// }: {
-//   recordId: string;
-//   state: RecordActionState;
-//   collectionName: string;
-//   onLikeToggle: (recordId: string) => void;
-//   onShareClick: (recordId: string) => void;
-// }) => (
-//   <div
-//     style={{
-//       display: "flex",
-//       alignItems: "center",
-//       justifyContent: "space-between",
-//       width: "100%",
-//       boxSizing: "border-box",
-//       padding: "4px 1px 2px 1px",
-//     }}
-//   >
-//     <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
-//       <button
-//         type="button"
-//         onClick={() => onLikeToggle(recordId)}
-//         style={{
-//           display: "inline-flex",
-//           alignItems: "center",
-//           gap: "4px",
-//           background: state.isLiked ? "#fff0f0" : "#fff",
-//           border: `1px solid ${state.isLiked ? "#f87171" : "#d0d0d0"}`,
-//           borderRadius: "5px",
-//           padding: "4px 10px",
-//           cursor: "pointer",
-//           fontSize: "9px",
-//           fontWeight: 500,
-//           color: state.isLiked ? "#e53535" : "#222",
-//           fontFamily: "Arial, sans-serif",
-//           flexShrink: 0,
-//           lineHeight: 1,
-//           whiteSpace: "nowrap",
-//           transition: "background 0.15s, border-color 0.15s, color 0.15s",
-//         }}
-//       >
-//         <HeartIcon filled={state.isLiked} />
-//         <span>{state.likeCount}</span>
-//       </button>
-//       <button
-//         type="button"
-//         style={{
-//           display: "inline-flex",
-//           alignItems: "center",
-//           gap: "4px",
-//           background: "#fff",
-//           border: "1px solid #d0d0d0",
-//           borderRadius: "5px",
-//           padding: "4px 10px",
-//           cursor: "default",
-//           fontSize: "9px",
-//           fontWeight: 500,
-//           color: "#222",
-//           fontFamily: "Arial, sans-serif",
-//           flexShrink: 0,
-//           lineHeight: 1,
-//           whiteSpace: "nowrap",
-//         }}
-//       >
-//         <EyeIcon />
-//         <span>{state.viewCount}</span>
-//       </button>
-//     </div>
-
-//     <button
-//       type="button"
-//       onClick={() => onShareClick(recordId)}
-//       style={{
-//         display: "inline-flex",
-//         alignItems: "center",
-//         gap: "4px",
-//         background: "#fff",
-//         border: "1px solid #d0d0d0",
-//         borderRadius: "5px",
-//         padding: "4px 10px",
-//         cursor: "pointer",
-//         fontSize: "9px",
-//         fontWeight: 500,
-//         color: "#222",
-//         fontFamily: "Arial, sans-serif",
-//         flexShrink: 0,
-//         lineHeight: 1,
-//         whiteSpace: "nowrap",
-//       }}
-//     >
-//       <ShareIcon />
-//       <span>{state.shareCount}</span>
-//     </button>
-//   </div>
-// );
-
 // export default function ChatCollectionsScreen({
 //   collectionNames,
 //   collectionTemplateMap,
@@ -239,10 +72,9 @@
 //   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 //   const [previousPipeline, setPreviousPipeline] = useState<any>(undefined);
 //   const [previousQuery, setPreviousQuery] = useState<any>(undefined);
-//   const [actionStates, setActionStates] = useState<
-//     Record<string, RecordActionState>
-//   >({});
+//   const [actionStates, setActionStates] = useState<Record<string, RecordActionState>>({});
 
+//   // ✅ Ref maps — passed to CollectionRecordCard so it can populate them
 //   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
 //   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 //   const firedRef = useRef<Set<string>>(new Set());
@@ -309,7 +141,7 @@
 //     const dwellTimers = new Map<string, ReturnType<typeof setTimeout>>();
 //     const readyToBatch = new Map<string, string>();
 //     let batchTimer: ReturnType<typeof setTimeout> | null = null;
-ma
+
 //     const fireBatch = async () => {
 //       if (!readyToBatch.size) return;
 //       const batch = Array.from(readyToBatch.entries()).map(
@@ -560,13 +392,7 @@ ma
 //           const id = rec?._id ?? rec?.id ?? "";
 //           if (!id) return;
 //           const { likeCount, viewCount, shareCount } = getInitialCounts(rec);
-//           // No sessionStorage — server count is source of truth on every load
-//           initialStates[id] = {
-//             likeCount,
-//             viewCount,
-//             shareCount,
-//             isLiked: false,
-//           };
+//           initialStates[id] = { likeCount, viewCount, shareCount, isLiked: false };
 //         });
 
 //         // Step 3: visitor id resolve
@@ -580,9 +406,7 @@ ma
 //               Date.now().toString(36);
 //             localStorage.setItem("bv_visitor_id", visitorId);
 //           }
-//         } catch {
-//           /* ignore */
-//         }
+//         } catch { /* ignore */ }
 
 //         const resolvedUserId = userId || visitorId;
 //         const isVisitor = !userId;
@@ -610,7 +434,6 @@ ma
 //             ([recordId, info]: [string, any]) => {
 //               if (!mergedStates[recordId]) return;
 
-//               // ✅ stats.impressions = increment-impressions-v2 API je field update kare che
 //               const serverImpressions =
 //                 info.stats?.impressions ??
 //                 info.stats?.ALL?.impressions ??
@@ -622,12 +445,10 @@ ma
 //                 likeCount:
 //                   info.stats?.likes ?? mergedStates[recordId].likeCount,
 //                 isLiked: info.liked ?? mergedStates[recordId].isLiked,
-//                 // Server impression count — source of truth on every load
 //                 viewCount:
 //                   serverImpressions !== null
 //                     ? serverImpressions
 //                     : mergedStates[recordId].viewCount,
-//                 // stats.views = increment-views API = shareCount
 //                 shareCount:
 //                   info.stats?.views != null
 //                     ? info.stats.views
@@ -657,9 +478,7 @@ ma
 //     };
 
 //     loadRecords();
-//     return () => {
-//       cancelled = true;
-//     };
+//     return () => { cancelled = true; };
 //   }, [
 //     currentCollection,
 //     userId,
@@ -733,25 +552,9 @@ ma
 //         <div className="collection-screen-body">
 //           <div className="collection-records" ref={scrollContainerRef}>
 //             {records.map((record, index) => {
-//               const iframeDoc = buildCollectionRecordIframeDoc(
-//                 record,
-//                 template,
-//                 index,
-//               );
+//               // Pre-compute recordId for actionState lookup (same as inside CollectionRecordCard)
+//               const iframeDoc = buildCollectionRecordIframeDoc(record, template, index);
 //               const recordId = iframeDoc.recordId;
-
-//               const resolvedCollectionName =
-//                 record?.collection_name ??
-//                 record?.collection ??
-//                 currentCollection ??
-//                 "";
-//               recordCollectionMap.current[recordId] = resolvedCollectionName;
-//               recordUrlMap.current[recordId] =
-//                 record?.url ??
-//                 record?.link ??
-//                 record?.page_url ??
-//                 record?.website ??
-//                 "";
 
 //               const actionState = actionStates[recordId] ?? {
 //                 likeCount: iframeDoc.initialLikeCount,
@@ -761,35 +564,20 @@ ma
 //               };
 
 //               return (
-//                 <div
+//                 // ✅ Use common CollectionRecordCard with layout="vertical"
+//                 <CollectionRecordCard
 //                   key={`${currentCollection}-${index}`}
-//                   className="collection-record-card"
-//                   data-record-id={recordId}
-//                   data-collection-name={resolvedCollectionName}
-//                   style={{ display: "flex", flexDirection: "column" }}
-//                 >
-//                   <iframe
-//                     ref={(el) => {
-//                       iframeRefs.current[recordId] = el;
-//                     }}
-//                     title={`Collection ${currentCollection} record ${index + 1}`}
-//                     sandbox="allow-scripts allow-same-origin allow-popups"
-//                     style={{
-//                       width: iframeDoc.frameWidth,
-//                       height: iframeDoc.frameHeight,
-//                       display: "block",
-//                       border: "none",
-//                     }}
-//                     srcDoc={iframeDoc.srcDoc}
-//                   />
-//                   <CardActionButtons
-//                     recordId={recordId}
-//                     state={actionState}
-//                     collectionName={iframeDoc.collectionName}
-//                     onLikeToggle={handleLikeToggle}
-//                     onShareClick={handleShareClick}
-//                   />
-//                 </div>
+//                   record={record}
+//                   template={template}
+//                   recordIndex={index}
+//                   actionState={actionState}
+//                   layout="horizontal"
+//                   iframeRefs={iframeRefs}
+//                   recordCollectionMap={recordCollectionMap}
+//                   recordUrlMap={recordUrlMap}
+//                   onLikeToggle={handleLikeToggle}
+//                   onShareClick={handleShareClick}
+//                 />
 //               );
 //             })}
 //           </div>
@@ -810,9 +598,7 @@ ma
 //               <button
 //                 type="button"
 //                 className="collection-page-btn"
-//                 onClick={() =>
-//                   setPage((prev) => Math.min(totalPages, prev + 1))
-//                 }
+//                 onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
 //                 disabled={page >= totalPages}
 //               >
 //                 Next
@@ -825,12 +611,14 @@ ma
 //   );
 // }
 
-
-
 // ChatCollectionsScreen.tsx
-// ✅ FIXED: stats.impressions → viewCount on refresh (increment-impressions-v2 updates this field)
-// ✅ Uses CollectionRecordCard common component — no duplicate icon/button code
+// ✅ FIXED:
+//   1. stats.impressions → viewCount on refresh (increment-impressions-v2 updates this field)
+//   2. Uses CollectionRecordCard common component — no duplicate icon/button code
+//   3. Map logic (recordCollectionMap, recordUrlMap) CollectionRecordCard andar handle thay che
+//   4. layout="vertical" correct kidu — full width column cards for grid layout
 
+import React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CollectionTemplate } from "../types/index";
 import { fetchCollectionRecords, fetchLikesHistory } from "../services/api";
@@ -854,6 +642,7 @@ type ChatCollectionsScreenProps = {
 
 const PAGE_LIMIT = 20;
 
+// ── Extract initial counts from record data ───────────────────────────────────
 const getInitialCounts = (rec: any) => {
   const statsAll = rec?.stats?.ALL ?? rec?.stats ?? null;
   return {
@@ -869,6 +658,7 @@ const getInitialCounts = (rec: any) => {
   };
 };
 
+// ── Visibility check for impression tracking ──────────────────────────────────
 const isCardVisibleInContainer = (
   el: HTMLElement,
   container: HTMLElement,
@@ -884,6 +674,8 @@ const isCardVisibleInContainer = (
   const vRatio = vOverlap / cardRect.height;
   return hRatio >= 0.5 && vRatio >= 0.5;
 };
+
+// ── Main Component ────────────────────────────────────────────────────────────
 
 export default function ChatCollectionsScreen({
   collectionNames,
@@ -905,9 +697,11 @@ export default function ChatCollectionsScreen({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [previousPipeline, setPreviousPipeline] = useState<any>(undefined);
   const [previousQuery, setPreviousQuery] = useState<any>(undefined);
-  const [actionStates, setActionStates] = useState<Record<string, RecordActionState>>({});
+  const [actionStates, setActionStates] = useState<
+    Record<string, RecordActionState>
+  >({});
 
-  // ✅ Ref maps — passed to CollectionRecordCard so it can populate them
+  // ✅ Ref maps — CollectionRecordCard andar populate thay che automatically
   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef<Set<string>>(new Set());
@@ -919,7 +713,7 @@ export default function ChatCollectionsScreen({
     return Math.max(1, Math.ceil(totalRecords / PAGE_LIMIT));
   }, [totalRecords]);
 
-  // ── Like + Toggle postMessage handler ────────────────────────────────────
+  // ── Like + Toggle postMessage handler ─────────────────────────────────────
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, recordId, likeCount, isLiked, success } = event.data ?? {};
@@ -963,7 +757,7 @@ export default function ChatCollectionsScreen({
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  // ── Impression — visible cards only, batch API, once per card per page ───
+  // ── Impression tracking — visible cards only, batch API ───────────────────
   useEffect(() => {
     if (!records.length || !currentCollection) return;
 
@@ -1057,7 +851,7 @@ export default function ChatCollectionsScreen({
       { root: null, threshold: 0.5 },
     );
 
-    const onHorizontalScroll = () => {
+    const onScroll = () => {
       container
         .querySelectorAll<HTMLElement>("[data-record-id]")
         .forEach((el) => {
@@ -1075,12 +869,12 @@ export default function ChatCollectionsScreen({
     container
       .querySelectorAll<HTMLElement>("[data-record-id]")
       .forEach((el) => observer.observe(el));
-    container.addEventListener("scroll", onHorizontalScroll, { passive: true });
-    onHorizontalScroll();
+    container.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     return () => {
       observer.disconnect();
-      container.removeEventListener("scroll", onHorizontalScroll);
+      container.removeEventListener("scroll", onScroll);
       dwellTimers.forEach((t) => clearTimeout(t));
       dwellTimers.clear();
       if (batchTimer) clearTimeout(batchTimer);
@@ -1112,7 +906,7 @@ export default function ChatCollectionsScreen({
     );
   };
 
-  // ── Share click → increment-views API + optimistic +1 + redirect ──────────
+  // ── Share click → increment-views API + optimistic +1 + open URL ──────────
   const handleShareClick = async (recordId: string) => {
     const collectionName =
       recordCollectionMap.current[recordId] ?? currentCollection ?? "";
@@ -1151,6 +945,7 @@ export default function ChatCollectionsScreen({
     }
   };
 
+  // ── Sync currentCollection when collectionNames changes ───────────────────
   useEffect(() => {
     if (!collectionNames.length) {
       setCurrentCollection(null);
@@ -1164,13 +959,14 @@ export default function ChatCollectionsScreen({
     });
   }, [collectionNames]);
 
+  // ── Reset page on collection/search change ────────────────────────────────
   useEffect(() => {
     setPage(1);
     setPreviousPipeline(undefined);
     setPreviousQuery(undefined);
   }, [currentCollection, searchQuery]);
 
-  // ── ✅ FIXED: Records + LikesHistory fetch with stats.impressions → viewCount ──
+  // ── Records + LikesHistory fetch ──────────────────────────────────────────
   useEffect(() => {
     if (templatesLoading || templatesError) return;
     if (!currentCollection || !userId || !sessionId) {
@@ -1179,6 +975,8 @@ export default function ChatCollectionsScreen({
       setActionStates({});
       return;
     }
+
+    const template = collectionTemplateMap.get(currentCollection);
 
     let cancelled = false;
 
@@ -1215,20 +1013,43 @@ export default function ChatCollectionsScreen({
             data.recordsTotal ?? data.records_total ?? nextRecords.length,
           ) || nextRecords.length;
 
-        // Step 2: Build initial actionStates from record data
-        const recordIds = nextRecords
-          .map((rec: any) => rec?._id ?? rec?.id ?? "")
-          .filter(Boolean);
-
+        // ✅ Step 2: Build initialStates using iframeDoc.recordId (NOT rec._id)
+        // This ensures actionStates keys EXACTLY match what CollectionRecordCard renders
         const initialStates: Record<string, RecordActionState> = {};
-        nextRecords.forEach((rec: any) => {
-          const id = rec?._id ?? rec?.id ?? "";
-          if (!id) return;
+        // rawIdToRecordId: API returns likesHistory keyed by raw _id, map to our recordId
+        const rawIdToRecordId: Record<string, string> = {};
+        // raw _id list for likesHistory API call
+        const rawRecordIds: string[] = [];
+
+        nextRecords.forEach((rec: any, index: number) => {
+          const rawId = rec?._id ?? rec?.id ?? "";
+          if (!rawId) return;
+
+          // ✅ Use buildCollectionRecordIframeDoc to get the SAME recordId that
+          // CollectionRecordCard will use during render — no mismatch possible
+          let recordId = rawId;
+          if (template?.html) {
+            const iframeDoc = buildCollectionRecordIframeDoc(
+              rec,
+              template,
+              index,
+            );
+            recordId = iframeDoc.recordId;
+          }
+
+          rawIdToRecordId[rawId] = recordId;
+          rawRecordIds.push(rawId);
+
           const { likeCount, viewCount, shareCount } = getInitialCounts(rec);
-          initialStates[id] = { likeCount, viewCount, shareCount, isLiked: false };
+          initialStates[recordId] = {
+            likeCount,
+            viewCount,
+            shareCount,
+            isLiked: false,
+          };
         });
 
-        // Step 3: visitor id resolve
+        // Step 3: Visitor id resolve
         let visitorId = "";
         try {
           visitorId = localStorage.getItem("bv_visitor_id") ?? "";
@@ -1239,16 +1060,18 @@ export default function ChatCollectionsScreen({
               Date.now().toString(36);
             localStorage.setItem("bv_visitor_id", visitorId);
           }
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
 
         const resolvedUserId = userId || visitorId;
         const isVisitor = !userId;
 
         // Step 4: fetchLikesHistory
-        const likesRes = recordIds.length
+        const likesRes = rawRecordIds.length
           ? await fetchLikesHistory({
               collection_name: currentCollection,
-              records: recordIds,
+              records: rawRecordIds,
               id: resolvedUserId,
               is_visitor: isVisitor,
             }).catch((err) => {
@@ -1259,39 +1082,41 @@ export default function ChatCollectionsScreen({
 
         if (cancelled) return;
 
-        // Step 5: ✅ FIXED — Merge likesHistory with stats.impressions → viewCount
+        // ✅ Step 5: Merge likesHistory — API returns raw _id as key, map to recordId
         const mergedStates = { ...initialStates };
         const likesData = likesRes?.data;
         if (likesData) {
-          Object.entries(likesData).forEach(
-            ([recordId, info]: [string, any]) => {
-              if (!mergedStates[recordId]) return;
+          Object.entries(likesData).forEach(([rawId, info]: [string, any]) => {
+            // Map raw _id → our recordId
+            const recordId = rawIdToRecordId[rawId] ?? rawId;
+            if (!mergedStates[recordId]) return;
 
-              const serverImpressions =
-                info.stats?.impressions ??
-                info.stats?.ALL?.impressions ??
-                info.stats?.GLOBAL?.impressions ??
-                null;
+            // ✅ stats.impressions = increment-impressions-v2 API je field update kare che
+            const serverImpressions =
+              info.stats?.impressions ??
+              info.stats?.ALL?.impressions ??
+              info.stats?.GLOBAL?.impressions ??
+              null;
 
-              mergedStates[recordId] = {
-                ...mergedStates[recordId],
-                likeCount:
-                  info.stats?.likes ?? mergedStates[recordId].likeCount,
-                isLiked: info.liked ?? mergedStates[recordId].isLiked,
-                viewCount:
-                  serverImpressions !== null
-                    ? serverImpressions
-                    : mergedStates[recordId].viewCount,
-                shareCount:
-                  info.stats?.views != null
-                    ? info.stats.views
-                    : mergedStates[recordId].shareCount,
-              };
-            },
-          );
+            mergedStates[recordId] = {
+              ...mergedStates[recordId],
+              likeCount: info.stats?.likes ?? mergedStates[recordId].likeCount,
+              isLiked: info.liked ?? mergedStates[recordId].isLiked,
+              // Server impression count — source of truth on every load
+              viewCount:
+                serverImpressions !== null
+                  ? serverImpressions
+                  : mergedStates[recordId].viewCount,
+              // stats.views = increment-views API = shareCount
+              shareCount:
+                info.stats?.views != null
+                  ? info.stats.views
+                  : mergedStates[recordId].shareCount,
+            };
+          });
         }
 
-        // Step 6: single render — no flicker
+        // Step 6: Single render — no flicker
         setRecords(nextRecords);
         setTotalRecords(total);
         setActionStates(mergedStates);
@@ -1311,7 +1136,9 @@ export default function ChatCollectionsScreen({
     };
 
     loadRecords();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [
     currentCollection,
     userId,
@@ -1323,24 +1150,29 @@ export default function ChatCollectionsScreen({
     templatesError,
   ]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Early returns ─────────────────────────────────────────────────────────
+
   if (templatesLoading)
     return (
       <div className="chat-collection-screen">
         <div className="collection-state">Loading collection templates...</div>
       </div>
     );
+
   if (templatesError)
     return (
       <div className="chat-collection-screen">
         <div className="collection-state error">{templatesError}</div>
       </div>
     );
+
   if (!collectionNames.length)
     return (
       <div className="chat-collection-screen">
         <div className="collection-state">No collections found.</div>
       </div>
     );
+
   if (!userId || !sessionId)
     return (
       <div className="chat-collection-screen">
@@ -1354,11 +1186,14 @@ export default function ChatCollectionsScreen({
     ? collectionTemplateMap.get(currentCollection)
     : undefined;
 
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
     <div className="chat-collection-screen">
       <div className="collection-screen-header">
         <h3 className="collection-screen-title">Collections</h3>
       </div>
+
       <div className="collection-tab-list">
         {collectionNames.map((name) => (
           <button
@@ -1385,8 +1220,13 @@ export default function ChatCollectionsScreen({
         <div className="collection-screen-body">
           <div className="collection-records" ref={scrollContainerRef}>
             {records.map((record, index) => {
-              // Pre-compute recordId for actionState lookup (same as inside CollectionRecordCard)
-              const iframeDoc = buildCollectionRecordIframeDoc(record, template, index);
+              // ✅ Pre-compute recordId using SAME function as inside CollectionRecordCard
+              // This ensures actionState lookup key exactly matches what card renders
+              const iframeDoc = buildCollectionRecordIframeDoc(
+                record,
+                template,
+                index,
+              );
               const recordId = iframeDoc.recordId;
 
               const actionState = actionStates[recordId] ?? {
@@ -1397,12 +1237,13 @@ export default function ChatCollectionsScreen({
               };
 
               return (
-                // ✅ Use common CollectionRecordCard with layout="vertical"
+                // ✅ layout="vertical" — full width column card for grid layout
                 <CollectionRecordCard
                   key={`${currentCollection}-${index}`}
                   record={record}
                   template={template}
                   recordIndex={index}
+                  recordId={recordId}
                   actionState={actionState}
                   layout="horizontal"
                   iframeRefs={iframeRefs}
@@ -1431,11 +1272,12 @@ export default function ChatCollectionsScreen({
               <button
                 type="button"
                 className="collection-page-btn"
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                onClick={() =>
+                  setPage((prev) => Math.min(totalPages, prev + 1))
+                }
                 disabled={page >= totalPages}
               >
                 Next
-                add new
               </button>
             </div>
           )}

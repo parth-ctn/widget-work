@@ -10,7 +10,8 @@
     "build:widget": "vite build",
     "build:embed": "cross-env BUILD_TARGET=embed vite build",
     "test": "npm run build:widget && npm run build:embed",
-    "preview": "vite preview"
+    "preview": "vite preview",
+      "bstart": "npm run build && npm start"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",

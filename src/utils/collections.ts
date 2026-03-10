@@ -30,7 +30,7 @@ export const mapMongoRagResponseToCollections = (
   });
 };
 
-const getValueByPath = (obj: any, path: string): any => {
+const getValueByPath = (obj: any, path: string): any => {   
   if (!obj) return null;
 
   const parts = path

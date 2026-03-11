@@ -13,12 +13,12 @@
 //   import { useCollectionActionStates, useImpressionTracking } from "../hooks";
 // ─────────────────────────────────────────────────────────────────────────────
 
-export { default as AgentAvatar } from "./AgentAvatar.tsx";
+export { default as AgentAvatar } from "./AgentAvtar.tsx";
 export { default as CollectionPagination } from "./CollectionPagination.tsx";
-export { default as ContactInfo } from "./ContactInfo";
-export { default as EmptyState } from "./EmptyState.tsx";
-export { default as LoadingSpinner } from "./LoadinSpinner";
+export { default as ContactInfo } from "./ContactInfo.tsx";
+export { default as EmptyState } from "./Emptystate.tsx";
+export { default as LoadingSpinner } from "./LoadingSpinner.tsx";
 export { default as SearchInput } from "./SearchInput.tsx";
-export { default as SocialIconsList } from "./SocialIconList.tsx";
+export { default as SocialIconsList } from "./SocialIconlist.tsx";
 export { default as TabNavigation } from "./TabNavigation.tsx";
 export type { TabItem } from "./TabNavigation.tsx";

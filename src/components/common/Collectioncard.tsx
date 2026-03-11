@@ -1,6 +1,3 @@
-// 
-
-
 // Collectioncard.tsx
 // ✅ FIXED:
 //   1. recordId hve prop tarke aave che — andar buildCollectionRecordIframeDoc FARI call nathi thati
@@ -111,12 +108,6 @@ export type CollectionRecordCardProps = {
   onShareClick: (recordId: string) => void;
   /** Optional: called when user clicks the card body area */
   onCardClick?: (recordId: string) => void;
-  /**
-   * ✅ NEW: visible pixel width for horizontal layout cards
-   * FeaturedSlider passes this so iframe scales to exactly fit 2 cards
-   * If not provided, card renders at full backend frameWidth (no scale)
-   */
-  visibleWidth?: number;
 };
 
 // ── CardActionButtons ─────────────────────────────────────────────────────────
@@ -239,7 +230,6 @@ export const CollectionRecordCard = ({
   onLikeToggle,
   onShareClick,
   onCardClick,
-  visibleWidth,
 }: CollectionRecordCardProps) => {
   // ✅ buildCollectionRecordIframeDoc sirf srcDoc/frameWidth/frameHeight mate — recordId mate nahi
   // recordId baharathi aave che so no drift between parent's actionStates and rendered card
@@ -259,38 +249,14 @@ export const CollectionRecordCard = ({
   recordCollectionMap.current[recordId] = resolvedCollectionName;
   recordUrlMap.current[recordId] = resolvedUrl;
 
-  // ── Numeric frame dimensions ──────────────────────────────────────────────
+  // ── For horizontal layout: scale iframe to fit exactly 2 cards per view ──
+  // Backend CSS sets fixed frameWidth inside iframe — we can't change it.
+  // So we render iframe at its natural frameWidth, then scale it down so
+  // 2 cards fit the container. Container clips overflow, scale handles resize.
   const numericFrameWidth =
     typeof frameWidth === "string"
       ? parseFloat(frameWidth)
       : (frameWidth as number);
-
-  const numericFrameHeight =
-    typeof frameHeight === "string"
-      ? parseFloat(frameHeight)
-      : (frameHeight as number);
-
-  // ── Scale calculation for horizontal layout ───────────────────────────────
-  // ✅ visibleWidth prop aave to iframe ne scale karo so exactly 2 cards fit thay
-  // Backend CSS frameWidth fixed che — transform: scale() vade resize kariye
-  const scale =
-    layout === "horizontal" &&
-    visibleWidth &&
-    visibleWidth > 0 &&
-    numericFrameWidth > 0
-      ? visibleWidth / numericFrameWidth
-      : 1;
-
-  // Wrapper width/height after scale
-  const cardDisplayWidth =
-    layout === "horizontal" && visibleWidth
-      ? visibleWidth
-      : layout === "vertical"
-        ? "100%"
-        : numericFrameWidth;
-
-  const cardDisplayHeight =
-    scale !== 1 ? numericFrameHeight * scale : numericFrameHeight;
 
   return (
     <div
@@ -300,43 +266,33 @@ export const CollectionRecordCard = ({
         display: "flex",
         flexDirection: "column",
         flexShrink: layout === "horizontal" ? 0 : undefined,
-        // ✅ CHANGED: horizontal layout ma visibleWidth use karo (2 cards fit exactly)
-        // vertical layout ma 100% width
-        width: cardDisplayWidth,
-        minWidth: layout === "horizontal" ? cardDisplayWidth : undefined,
+        // horizontal: fixed pixel width = half container minus gap
+        // We use the iframe's own frameWidth as reference for scroll calculation
+        // but visually we contain it. Parent slider sets container width="100%"
+        width: layout === "horizontal" ? numericFrameWidth : "100%",
+        minWidth: layout === "horizontal" ? numericFrameWidth : undefined,
         boxSizing: "border-box",
         overflow: "hidden",
       }}
     >
-      {/* ✅ CHANGED: iframe wrapper div — scale transform apply karo */}
-      <div
-        style={{
-          width: cardDisplayWidth,
-          height: cardDisplayHeight,
-          overflow: "hidden",
-          position: "relative",
-          flexShrink: 0,
+      <iframe
+        ref={(el) => {
+          iframeRefs.current[recordId] = el;
         }}
-      >
-        <iframe
-          ref={(el) => {
-            iframeRefs.current[recordId] = el;
-          }}
-          title={`Collection record ${recordIndex + 1}`}
-          sandbox="allow-scripts allow-same-origin allow-popups"
-          style={{
-            // ✅ CHANGED: iframe hamesha backend frameWidth/frameHeight par render thay
-            // transform: scale() vade visibleWidth ma fit karo — CSS touch nathi karta
-            width: numericFrameWidth,
-            height: numericFrameHeight,
-            display: "block",
-            border: "none",
-            transformOrigin: "top left",
-            transform: scale !== 1 ? `scale(${scale})` : undefined,
-          }}
-          srcDoc={srcDoc}
-        />
-      </div>
+        title={`Collection record ${recordIndex + 1}`}
+        sandbox="allow-scripts allow-same-origin allow-popups"
+        style={{
+          width: frameWidth,
+          height: frameHeight,
+          display: "block",
+          border: "none",
+          // vertical layout → stretch to fill container width
+          ...(layout === "vertical"
+            ? { width: "100%", maxWidth: frameWidth }
+            : {}),
+        }}
+        srcDoc={srcDoc}
+      />
       <CardActionButtons
         recordId={recordId}
         state={actionState}

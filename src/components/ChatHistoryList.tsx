@@ -26,7 +26,7 @@ import { mapMongoRagResponseToCollections } from "../utils/collections";
 
 // ── Common components ─────────────────────────────────────────────────────────
 import SearchInput from "./common/SearchInput";
-import ConfirmDeleteModal from "../modals/ConfirmDelete";
+import ConfirmDeleteModal from "../modals/ConfirmDeletemodal";
 
 interface ChatHistoryListProps {
   batchId: string;
@@ -37,7 +37,7 @@ interface ChatHistoryListProps {
   agentData?: AgentData;
 }
 
-export default function ChatHistoryList({
+export default function ({
   batchId,
   userUuid,
   onSessionSelect,

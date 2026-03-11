@@ -21,11 +21,12 @@ import {
 } from "./common/Collectioncard";
 
 // ── Common components & hooks ─────────────────────────────────────────────────
-import LoadingSpinner from "./common/LoadinSpinner";
-import EmptyState from "./common/EmptyState";
+
+import LoadingSpinner from "./common/LoadingSpinner"
+import EmptyState from "./common/Emptystate";
 import CollectionPagination from "./common/CollectionPagination";
 import { useCollectionActionStates } from "../hooks/useCollectionActionstates";
-import { useImpressionTracking } from "../hooks/useImpressionTracking";
+import { useImpressionTracking } from "../hooks/useImpressiontracking";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -388,7 +389,7 @@ export default function ChatCollectionsScreen({
                   recordIndex={index}
                   recordId={recordId}
                   actionState={actionState}
-                  layout="horizontal"
+                  layout="vertical"
                   iframeRefs={iframeRefs}
                   recordCollectionMap={recordCollectionMap}
                   recordUrlMap={recordUrlMap}

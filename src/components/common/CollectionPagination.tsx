@@ -1,4 +1,3 @@
-
 // components/common/CollectionPagination.tsx
 // Reusable Previous / Page X of Y / Next pagination bar
 // Used in: ChatCollectionsScreen

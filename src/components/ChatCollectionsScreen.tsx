@@ -389,7 +389,7 @@ export default function ChatCollectionsScreen({
                   recordIndex={index}
                   recordId={recordId}
                   actionState={actionState}
-                  layout="vertical"
+                  layout="horizontal"
                   iframeRefs={iframeRefs}
                   recordCollectionMap={recordCollectionMap}
                   recordUrlMap={recordUrlMap}

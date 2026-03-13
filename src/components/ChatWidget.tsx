@@ -45,7 +45,7 @@ import {
   type RecordActionState,
 } from "./common/Collectioncard.tsx";
 
-import AgentAvatar from "./common/Agentavtar.tsx";
+import AgentAvatar from "./common/AgentAvtar.tsx";
 import SocialIconsList from "./common/SocialIconlist.tsx";
 import ContactInfo from "./common/ContactInfo";
 import LoadingSpinner from "./common/LoadingSpinner";
@@ -56,6 +56,8 @@ import { useCollectionActionStates } from "../hooks/useCollectionActionstates";
 import { useImpressionTracking } from "../hooks/useImpressiontracking";
 
 import "../styles.scss";
+import { renderMathInHtml } from "../utils/katex";
+
 
 // ── FeaturedCollection type ───────────────────────────────────────────────────
 type FeaturedCollection = {
@@ -1023,7 +1025,9 @@ export default function ChatWidget({
         terminateOthers: false,
       });
     }
-    sendMessage(input);
+  
+    sendMessage(renderMathInHtml(input));
+    // sendMessage(input);
     setInput("");
     setActiveTab("chat");
   };
@@ -1044,7 +1048,8 @@ export default function ChatWidget({
     disconnectAfterResponseWhenClosedRef.current = false;
     shouldAutoScrollRef.current = true;
     if (activeTab === "home") await prepareNewSessionFromHome();
-    sendMessage(question);
+    // sendMessage(question);
+    sendMessage(renderMathInHtml(question));
     setActiveTab("chat");
     setIsSendingQuestion(false);
   };
@@ -1892,9 +1897,18 @@ export default function ChatWidget({
                                   className={`message-bubble ${m.type} ${hasCollectionsSection ? "has-collections" : ""}`}
                                 >
                                   <div
-                                    dangerouslySetInnerHTML={{ __html: m.text }}
+                                    dangerouslySetInnerHTML={{
+                                      __html: renderMathInHtml(m.text),
+                                    }}
                                     className="message-text"
                                   />
+
+                                  {/* <div
+                                    dangerouslySetInnerHTML={{
+                                     __html: m.type === "incoming" ? renderMathInHtml(m.text) : m.text,
+                                    }}
+                                    className="message-text"
+                                  /> */}
                                   {hasCollectionsSection && (
                                     <div className="collapsible-section collection-section">
                                       <div

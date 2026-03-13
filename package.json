@@ -11,12 +11,13 @@
     "build:embed": "cross-env BUILD_TARGET=embed vite build",
     "test": "npm run build:widget && npm run build:embed",
     "preview": "vite preview",
-      "bstart": "npm run build && npm start"
+    "bstart": "npm run build && npm start"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
     "detectincognitojs": "^1.6.2",
     "dompurify": "^3.3.0",
+    "katex": "^0.16.38",
     "lucide": "^0.545.0",
     "lucide-react": "^0.545.0",
     "marked": "^16.4.1",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/katex": "^0.16.8",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

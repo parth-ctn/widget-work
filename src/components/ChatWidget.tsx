@@ -1026,12 +1026,15 @@ export default function ChatWidget({
       });
     }
   
-    sendMessage(renderMathInHtml(input));
-    // sendMessage(input);
+    // sendMessage(renderMathInHtml(input));
+  
+    sendMessage(input);
+console.log("m.text will be:", input); // ← add this
     setInput("");
     setActiveTab("chat");
   };
 
+  
   const handleInputSubmit = () => {
     if (activeChatView === "collection") {
       handleCollectionSearch();
@@ -1048,8 +1051,8 @@ export default function ChatWidget({
     disconnectAfterResponseWhenClosedRef.current = false;
     shouldAutoScrollRef.current = true;
     if (activeTab === "home") await prepareNewSessionFromHome();
-    // sendMessage(question);
-    sendMessage(renderMathInHtml(question));
+    sendMessage(question);
+    // sendMessage(renderMathInHtml(question));
     setActiveTab("chat");
     setIsSendingQuestion(false);
   };
@@ -1896,19 +1899,19 @@ export default function ChatWidget({
                                 <div
                                   className={`message-bubble ${m.type} ${hasCollectionsSection ? "has-collections" : ""}`}
                                 >
-                                  <div
+                                  {/* <div
                                     dangerouslySetInnerHTML={{
                                       __html: renderMathInHtml(m.text),
                                     }}
                                     className="message-text"
-                                  />
+                                  /> */}
 
-                                  {/* <div
+                                  { <div
                                     dangerouslySetInnerHTML={{
-                                     __html: m.type === "incoming" ? renderMathInHtml(m.text) : m.text,
+                                    __html: m.type === "incoming" ? m.text : renderMathInHtml(m.text),
                                     }}
                                     className="message-text"
-                                  /> */}
+                                  /> }
                                   {hasCollectionsSection && (
                                     <div className="collapsible-section collection-section">
                                       <div

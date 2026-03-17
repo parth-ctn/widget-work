@@ -2,6 +2,7 @@
 // @import "bootstrap/scss/bootstrap";
 
 // Shadow DOM provides isolation - just set base styles
+@import "katex/dist/katex.min.css";
 * {
   box-sizing: border-box;
   font-family:
@@ -4292,3 +4293,17 @@ p {
   }
 }
 
+.katex .katex-mathml {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
+ 
+/* KaTeX HTML — આ જ visible રહેવો જોઈએ */
+.katex .katex-html {
+  display: inline;
+}

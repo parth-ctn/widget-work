@@ -3,7 +3,8 @@ import ChatWidget from "./components/ChatWidget";
 import { VisitorProvider } from "./contexts/VisitorContext";
 import type { InitConfig } from "./types/index";
 import { WIDGET_CONFIG } from "./config/constants";
-import styleContent from "./styles.scss?inline"; // Import styles as string
+import styleContent from "./styles.scss?inline";
+import katexCss from "katex/dist/katex.min.css?inline";
 
 // Prevent multiple initializations
 let isInitialized = false;
@@ -12,12 +13,11 @@ let rootInstance: ReactDOM.Root | null = null;
 function init(config: InitConfig = {}) {
   console.log("🚀 ChatWidget.init called with config:", config);
 
-  // Prevent multiple initializationsd
   if (isInitialized) {
     console.warn(
-      "⚠️ ChatWidget already initialized, skipping duplicate init call"
+      "⚠️ ChatWidget already initialized, skipping duplicate init call",
     );
-    return; 
+    return;
   }
 
   const agentId = config.publishId || window.WEBMAP_WIDGET_CONFIG?.publishId;
@@ -35,13 +35,42 @@ function init(config: InitConfig = {}) {
   if (config.shadowRoot) {
     console.log(
       "🔍 Looking for container in shadow DOM with ID:",
-      WIDGET_CONFIG.CONTAINER_ID
+      WIDGET_CONFIG.CONTAINER_ID,
     );
 
-    // Inject styles into shadow DOM
+    // Inject app styles into shadow DOM
     const style = document.createElement("style");
     style.textContent = styleContent;
     config.shadowRoot.appendChild(style);
+
+    // KaTeX CSS → shadow DOM
+    const katexStyle = document.createElement("style");
+    katexStyle.textContent = katexCss;
+    config.shadowRoot.appendChild(katexStyle);
+
+    // KaTeX @font-face → document.head (shadow DOM fonts support નથી)
+    if (!document.getElementById("katex-fonts-injected")) {
+      const katexFontStyle = document.createElement("style");
+      katexFontStyle.id = "katex-fonts-injected";
+      katexFontStyle.textContent = `
+        @font-face { font-family: 'KaTeX_Main'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Main'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff2') format('woff2'); font-weight: bold; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Main'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff2') format('woff2'); font-weight: normal; font-style: italic; }
+        @font-face { font-family: 'KaTeX_Math'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2') format('woff2'); font-weight: normal; font-style: italic; }
+        @font-face { font-family: 'KaTeX_Size1'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Size2'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Size3'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Size4'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_AMS'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Caligraphic'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Fraktur'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_SansSerif'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Script'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'KaTeX_Typewriter'; src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+      `;
+      document.head.appendChild(katexFontStyle);
+    }
+
     console.log("✅ Styles injected into shadow DOM");
 
     container = config.shadowRoot.getElementById(WIDGET_CONFIG.CONTAINER_ID);
@@ -91,7 +120,7 @@ function init(config: InitConfig = {}) {
         batchId={batchId}
         agentData={config.agentData}
       />
-    </VisitorProvider>
+    </VisitorProvider>,
   );
 
   isInitialized = true;
